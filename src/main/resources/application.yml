@@ -12,3 +12,14 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+files:
+  video: "videos/"
+
+file:
+  video:
+    hsl: "videos_hsl/"
