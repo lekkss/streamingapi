@@ -8,11 +8,14 @@ import com.lekkss.streamingapi.services.AuthService;
 import com.lekkss.streamingapi.utils.AuthResponse;
 import com.lekkss.streamingapi.utils.LoginRequest;
 import com.lekkss.streamingapi.utils.RegisterRequest;
+import com.lekkss.streamingapi.utils.Response;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 
 @Service
@@ -31,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponse login(LoginRequest loginRequest) {
+    public Response<?> login(LoginRequest loginRequest) {
         // Authenticate the user
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -45,8 +48,14 @@ public class AuthServiceImpl implements AuthService {
 
         // Generate a JWT token
         var token = jwtService.generateToken(user);
+        var responseData = Map.of(
+                "token", token,
+                "user", user
+        );
+
         // Return the response
-        return new AuthResponse(token,true, "User logged in successfully");
+        return new Response<>(true,"Successfully logged in", responseData);
+//        return new AuthResponse(token,true, "User logged in successfully");
     }
 
     @Override
@@ -55,7 +64,6 @@ public class AuthServiceImpl implements AuthService {
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new IllegalArgumentException("User with this email already exists");
         }
-
         // Map RegisterRequest to User entity
         var user = new User();
         user.setFirstName(registerRequest.getFirstName());
